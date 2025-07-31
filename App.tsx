@@ -22,7 +22,7 @@ function App() {
 
   return (
     <NavigationContainer>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} /> // 깃허브 테스트
+      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} /> // 깃허브
       <Stack.Navigator 
         initialRouteName="Welcome"
         screenOptions={{
