@@ -1,11 +1,34 @@
+/**
+ * AnswerCard - 답변 표시 컴포넌트
+ * 
+ * 기능:
+ * - 가족 구성원의 답변을 카드 형태로 표시
+ * - 답변 작성자 정보 (이름, 역할) 표시
+ * - 답변 내용과 작성 시간 표시
+ * 
+ * 로직:
+ * - props로 전달받은 답변과 멤버 정보를 화면에 표시
+ * - 멤버의 이름과 역할을 상단에 표시
+ * - 답변 내용을 카드 형태로 표시
+ * - 작성 시간을 하단에 표시
+ * 
+ * Props:
+ * - answer: Answer - 표시할 답변 객체
+ * - member: FamilyMember - 답변 작성자 정보
+ */
+
+// React Native 기본 라이브러리
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { colors } from '../constants/colors';
-import { Answer, FamilyMember } from '../types';
 
+// 프로젝트 내부 모듈
+import { colors } from '../constants/colors'; // 색상 테마
+import { Answer, FamilyMember } from '../types'; // 답변 및 가족 구성원 타입 정의
+
+// 컴포넌트 Props 인터페이스 정의
 interface AnswerCardProps {
-  answer: Answer;
-  member: FamilyMember;
+  answer: Answer; // 표시할 답변 데이터
+  member: FamilyMember; // 답변을 작성한 가족 구성원 정보
 }
 
 export const AnswerCard: React.FC<AnswerCardProps> = ({ answer, member }) => {

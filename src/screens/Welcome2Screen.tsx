@@ -1,16 +1,39 @@
+/**
+ * Welcome2Screen - 가족 설정 화면
+ * 
+ * 기능:
+ * - 사용자가 가족을 생성하거나 기존 가족에 참여할 수 있는 선택 화면
+ * - 가족 생성과 참여 중 선택할 수 있는 두 개의 버튼 제공
+ * 
+ * 로직:
+ * - "가족 만들기" 버튼 클릭 시 CreateFamilyScreen으로 이동
+ * - "가족 참여하기" 버튼 클릭 시 JoinFamilyScreen으로 이동
+ * - 각 화면에서 가족 생성/참여 완료 후 MainScreen으로 이동
+ * 
+ * 백엔드 연동 필요:
+ * - 가족 생성 API (/families/create)
+ * - 가족 참여 API (/families/join)
+ * - 초대 코드 생성 및 검증 시스템
+ */
+
+// React Native 기본 라이브러리
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
-import { colors } from '../constants/colors';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../types';
 
-type WelcomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Welcome'>;
+// 프로젝트 내부 모듈
+import { colors } from '../constants/colors'; // 색상 테마
+import { StackNavigationProp } from '@react-navigation/stack'; // 네비게이션 타입
+import { RootStackParamList } from '../types'; // 네비게이션 스택 타입 정의
 
-interface WelcomeScreenProps {
-  navigation: WelcomeScreenNavigationProp;
+// 네비게이션 타입 정의 (Welcome2 화면에서 사용할 네비게이션 함수들의 타입)
+type Welcome2ScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Welcome2'>;
+
+// 컴포넌트 Props 인터페이스 정의
+interface Welcome2ScreenProps {
+  navigation: Welcome2ScreenNavigationProp; // 네비게이션 객체
 }
 
-export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
+export const Welcome2Screen: React.FC<Welcome2ScreenProps> = ({ navigation }) => {
   const handleCreateFamily = () => {
     navigation.navigate('CreateFamily');
   };
