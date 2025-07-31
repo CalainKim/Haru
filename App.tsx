@@ -2,7 +2,7 @@
  * 하루한번 - 가족을 잇는 감성 커뮤니케이션 앱
  * https://github.com/facebook/react-native
  *
- * @format
+ * @format 
  */
 
 import React from 'react'; // 리액트
@@ -15,14 +15,14 @@ import { MainScreen } from './src/screens/MainScreen'; // 메인 스크린
 import { CreateFamilyScreen } from './src/screens/CreateFamilyScreen'; // 가족 생성 스크린
 import { JoinFamilyScreen } from './src/screens/JoinFamilyScreen'; // 가족 참여 스크린
 
-const Stack = createStackNavigator(); 
+const Stack = createStackNavigator(); // 스택 네비게이션 생성
 
 function App() {
-  const isDarkMode = useColorScheme() === 'dark';
+  const isDarkMode = useColorScheme() === 'dark'; // 다크 모드 확인
 
   return (
     <NavigationContainer>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} /> // 깃허브 테스트
       <Stack.Navigator 
         initialRouteName="Welcome"
         screenOptions={{
