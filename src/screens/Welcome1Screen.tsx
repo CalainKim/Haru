@@ -3,7 +3,7 @@
  * 
  * 기능:
  * - 앱의 첫 진입점으로 사용자 인증 방법을 제공
- * - 페이스북, 카카오톡, 이메일 로그인 옵션 제공
+ * - 구글, 카카오톡, 이메일 로그인 옵션 제공
  * - 건너뛰기 기능으로 로그인 없이 앱 사용 가능(**팀원들이랑 회의 필요**)
  * 
  * 로직:
@@ -13,7 +13,7 @@
  * - 건너뛰기 시 바로 Welcome2로 이동(**팀원들이랑 회의 필요**)
  * 
  * 백엔드 연동 필요:
- * - 소셜 로그인 SDK 연동 (페이스북, 카카오톡)
+ * - 소셜 로그인 SDK 연동 (구글, 카카오톡)
  * - JWT 토큰 기반 인증 시스템
  * - 사용자 정보 저장 및 조회
  */
@@ -36,11 +36,11 @@ interface Welcome1ScreenProps {
 }
 
 export const Welcome1Screen: React.FC<Welcome1ScreenProps> = ({ navigation }) => {
-  const handleFacebookLogin = () => {
+  const handleGoogleLogin = () => {
     // ===== 백엔드 개발자 작업 필요 =====
-    // 1. 페이스북 SDK 연동 (react-native-fbsdk-next)
-    // 2. 페이스북 로그인 API 호출
-    // 3. 서버에서 페이스북 토큰 검증
+    // 1. 구글 SDK 연동 (@react-native-google-signin/google-signin)
+    // 2. 구글 로그인 API 호출
+    // 3. 서버에서 구글 토큰 검증
     // 4. 사용자 정보 조회 또는 신규 사용자 등록
     // 5. JWT 토큰 발급 및 로컬 저장
     // 6. 로그인 성공 시 Welcome2로 이동, 실패 시 에러 메시지
@@ -100,12 +100,12 @@ export const Welcome1Screen: React.FC<Welcome1ScreenProps> = ({ navigation }) =>
         
         <View style={styles.loginContainer}>
           <TouchableOpacity 
-            style={styles.facebookButton}
-            onPress={handleFacebookLogin}
+            style={styles.googleButton}
+            onPress={handleGoogleLogin}
           >
             <View style={styles.buttonContent}>
-              <Text style={styles.facebookIcon}>📘</Text>
-              <Text style={styles.facebookButtonText}>페이스북으로 로그인</Text>
+              <Text style={styles.googleIcon}>G</Text>
+              <Text style={styles.googleButtonText}>구글로 로그인</Text>
             </View>
           </TouchableOpacity>
           
@@ -114,7 +114,7 @@ export const Welcome1Screen: React.FC<Welcome1ScreenProps> = ({ navigation }) =>
             onPress={handleKakaoLogin}
           >
             <View style={styles.buttonContent}>
-              <Text style={styles.kakaoIcon}>💛</Text>
+                             <Text style={styles.kakaoIcon}>K</Text>
               <Text style={styles.kakaoButtonText}>카카오톡으로 로그인</Text>
             </View>
           </TouchableOpacity>
@@ -181,12 +181,22 @@ const styles = StyleSheet.create({
     gap: 16,
     marginBottom: 30,
   },
-  facebookButton: {
-    backgroundColor: '#1877F2',
+  googleButton: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#DDDDDD',
     paddingVertical: 16,
     paddingHorizontal: 32,
     borderRadius: 12,
     alignItems: 'center',
+    shadowColor: '#000000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   kakaoButton: {
     backgroundColor: '#FEE500',
@@ -207,7 +217,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  facebookIcon: {
+  googleIcon: {
     fontSize: 20,
     marginRight: 8,
   },
@@ -219,8 +229,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginRight: 8,
   },
-  facebookButtonText: {
-    color: colors.textDark,
+  googleButtonText: {
+    color: '#333333',
     fontSize: 16,
     fontWeight: '600',
   },

@@ -3,12 +3,12 @@
  * 
  * 기능:
  * - 새로운 가족 그룹을 생성하는 화면
- * - 가족 이름, 사용자 이름, 역할(부모/자녀), 세부 역할(엄마/아빠/딸/아들) 입력
+ * - 가족 이름, 사용자 이름, 질문 도착 시간, 역할 선택
  * - 고유한 초대 코드 생성 및 표시
  * 
  * 로직:
  * - 사용자가 가족 이름과 자신의 정보를 입력
- * - 역할 선택에 따라 세부 역할 옵션이 동적으로 변경
+ * - 질문 도착 시간과 역할을 드롭다운으로 선택
  * - 모든 필수 필드 입력 후 가족 생성 버튼 클릭
  * - 서버에서 고유한 초대 코드를 생성하고 표시
  * - 생성 완료 후 MainScreen으로 이동
@@ -28,6 +28,7 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, SafeAreaView, Aler
 import { colors } from '../constants/colors'; // 색상 테마
 import { StackNavigationProp } from '@react-navigation/stack'; // 네비게이션 타입
 import { RootStackParamList } from '../types'; // 네비게이션 스택 타입 정의
+import { Dropdown } from '../components/Dropdown'; // 드롭다운 컴포넌트
 
 // 네비게이션 타입 정의 (CreateFamily 화면에서 사용할 네비게이션 함수들의 타입)
 type CreateFamilyScreenNavigationProp = StackNavigationProp<RootStackParamList, 'CreateFamily'>;
@@ -40,8 +41,40 @@ interface CreateFamilyScreenProps {
 export const CreateFamilyScreen: React.FC<CreateFamilyScreenProps> = ({ navigation }) => {
   const [familyName, setFamilyName] = useState('');
   const [memberName, setMemberName] = useState('');
-  const [role, setRole] = useState<'parent' | 'child'>('parent');
-  const [familyRole, setFamilyRole] = useState<'mother' | 'father' | 'daughter' | 'son'>('mother');
+  const [questionTime, setQuestionTime] = useState('12:34');
+  const [familyRole, setFamilyRole] = useState('');
+  const [isFamilyCreated, setIsFamilyCreated] = useState(false);
+  const [inviteCode, setInviteCode] = useState('');
+
+  // 질문 도착 시간 옵션
+  const timeOptions = [
+    { label: '매일 7:00AM', value: '07:00' },
+    { label: '매일 8:00AM', value: '08:00' },
+    { label: '매일 9:00AM', value: '09:00' },
+    { label: '매일 10:00AM', value: '10:00' },
+    { label: '매일 11:00AM', value: '11:00' },
+    { label: '매일 12:00PM', value: '12:00' },
+    { label: '매일 12:30PM', value: '12:30' },
+    { label: '매일 1:00PM', value: '13:00' },
+    { label: '매일 2:00PM', value: '14:00' },
+    { label: '매일 3:00PM', value: '15:00' },
+    { label: '매일 4:00PM', value: '16:00' },
+    { label: '매일 5:00PM', value: '17:00' },
+    { label: '매일 6:00PM', value: '18:00' },
+    { label: '매일 7:00PM', value: '19:00' },
+    { label: '매일 8:00PM', value: '20:00' },
+    { label: '매일 9:00PM', value: '21:00' },
+    { label: '매일 10:00PM', value: '22:00' },
+  ];
+
+  // 역할 옵션
+  const roleOptions = [
+    { label: '아버지', value: 'father' },
+    { label: '어머니', value: 'mother' },
+    { label: '딸', value: 'daughter' },
+    { label: '아들', value: 'son' },
+    { label: '기타', value: 'other' },
+  ];
 
   const generateInviteCode = () => {
     // ===== 백엔드 개발자 작업 필요 =====
@@ -54,7 +87,7 @@ export const CreateFamilyScreen: React.FC<CreateFamilyScreenProps> = ({ navigati
   };
 
   const handleCreateFamily = () => {
-    if (!familyName.trim() || !memberName.trim()) {
+    if (!familyName.trim() || !memberName.trim() || !familyRole) {
       Alert.alert('알림', '모든 필드를 입력해주세요.');
       return;
     }
@@ -65,20 +98,17 @@ export const CreateFamilyScreen: React.FC<CreateFamilyScreenProps> = ({ navigati
     // 3. 가족 정보와 멤버 정보를 데이터베이스에 저장
     // 4. 생성된 초대 코드를 응답으로 받아서 표시
     // 5. 에러 처리 (중복된 가족명, 네트워크 오류 등)
-    // 6. 성공 시 Main 화면으로 이동
+    // 6. 성공 시 초대 코드 표시, 실패 시 에러 메시지
     // =================================
 
     // 임시 성공 처리 (백엔드 연동 후 제거)
-    Alert.alert(
-      '가족 생성 완료!',
-      '초대 코드: ABC123\n\n이 코드를 가족 구성원들에게 공유해주세요. (백엔드 연동 후 실제 코드가 생성됩니다)',
-      [
-        {
-          text: '확인',
-          onPress: () => navigation.navigate('Main')
-        }
-      ]
-    );
+    const code = generateInviteCode();
+    setInviteCode(code);
+    setIsFamilyCreated(true);
+  };
+
+  const handleContinueToMain = () => {
+    navigation.navigate('Main');
   };
 
   return (
@@ -92,107 +122,86 @@ export const CreateFamilyScreen: React.FC<CreateFamilyScreenProps> = ({ navigati
       </View>
 
       <View style={styles.content}>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>가족 정보</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="가족 이름을 입력하세요"
-            value={familyName}
-            onChangeText={setFamilyName}
-            placeholderTextColor={colors.textSecondary}
-          />
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>내 정보</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="내 이름을 입력하세요"
-            value={memberName}
-            onChangeText={setMemberName}
-            placeholderTextColor={colors.textSecondary}
-          />
-          
-          <View style={styles.roleContainer}>
-            <Text style={styles.roleLabel}>역할 선택:</Text>
-            <View style={styles.roleButtons}>
-              <TouchableOpacity
-                style={[styles.roleButton, role === 'parent' && styles.roleButtonActive]}
-                onPress={() => {
-                  setRole('parent');
-                  setFamilyRole('mother');
-                }}
-              >
-                <Text style={[styles.roleButtonText, role === 'parent' && styles.roleButtonTextActive]}>
-                  부모님
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.roleButton, role === 'child' && styles.roleButtonActive]}
-                onPress={() => {
-                  setRole('child');
-                  setFamilyRole('daughter');
-                }}
-              >
-                <Text style={[styles.roleButtonText, role === 'child' && styles.roleButtonTextActive]}>
-                  자녀
-                </Text>
-              </TouchableOpacity>
+        {!isFamilyCreated ? (
+          // 가족 생성 폼
+          <>
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>가족 이름</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="가족 이름을 입력하세요"
+                value={familyName}
+                onChangeText={setFamilyName}
+                placeholderTextColor={colors.textSecondary}
+              />
             </View>
-          </View>
 
-          {role === 'parent' && (
-            <View style={styles.familyRoleContainer}>
-              <Text style={styles.familyRoleLabel}>구체적인 역할:</Text>
-              <View style={styles.familyRoleButtons}>
-                <TouchableOpacity
-                  style={[styles.familyRoleButton, familyRole === 'mother' && styles.familyRoleButtonActive]}
-                  onPress={() => setFamilyRole('mother')}
-                >
-                  <Text style={[styles.familyRoleButtonText, familyRole === 'mother' && styles.familyRoleButtonTextActive]}>
-                    엄마
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.familyRoleButton, familyRole === 'father' && styles.familyRoleButtonActive]}
-                  onPress={() => setFamilyRole('father')}
-                >
-                  <Text style={[styles.familyRoleButtonText, familyRole === 'father' && styles.familyRoleButtonTextActive]}>
-                    아빠
-                  </Text>
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>나의 정보(닉네임)</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="내 이름을 입력하세요"
+                value={memberName}
+                onChangeText={setMemberName}
+                placeholderTextColor={colors.textSecondary}
+              />
+            </View>
+
+            <View style={styles.section}>
+              <Dropdown
+                label="질문이 도착할 시간"
+                placeholder="매일 12:34PM▼"
+                options={timeOptions}
+                value={questionTime}
+                onValueChange={setQuestionTime}
+              />
+            </View>
+
+            <View style={styles.section}>
+              <Dropdown
+                label={`${memberName || '○○'}님은 부모님이신가요?`}
+                placeholder="선택▼"
+                options={roleOptions}
+                value={familyRole}
+                onValueChange={setFamilyRole}
+              />
+            </View>
+
+            <TouchableOpacity style={styles.createButton} onPress={handleCreateFamily}>
+              <Text style={styles.createButtonText}>가족 만들기</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          // 가족 생성 완료 후 초대 코드 표시
+          <>
+            <View style={styles.successSection}>
+              <View style={styles.successIcon}>
+                <Text style={styles.successIconText}>🎉</Text>
+              </View>
+              <Text style={styles.successTitle}>가족 생성 완료!</Text>
+              <Text style={styles.successSubtitle}>
+                이제 가족 구성원들을 초대해보세요
+              </Text>
+            </View>
+
+            <View style={styles.inviteCodeSection}>
+              <Text style={styles.inviteCodeLabel}>초대 코드</Text>
+              <View style={styles.inviteCodeContainer}>
+                <Text style={styles.inviteCodeText}>{inviteCode}</Text>
+                <TouchableOpacity style={styles.copyButton}>
+                  <Text style={styles.copyButtonText}>복사</Text>
                 </TouchableOpacity>
               </View>
+              <Text style={styles.inviteCodeHint}>
+                이 코드를 가족 구성원들에게 공유해주세요
+              </Text>
             </View>
-          )}
 
-          {role === 'child' && (
-            <View style={styles.familyRoleContainer}>
-              <Text style={styles.familyRoleLabel}>구체적인 역할:</Text>
-              <View style={styles.familyRoleButtons}>
-                <TouchableOpacity
-                  style={[styles.familyRoleButton, familyRole === 'daughter' && styles.familyRoleButtonActive]}
-                  onPress={() => setFamilyRole('daughter')}
-                >
-                  <Text style={[styles.familyRoleButtonText, familyRole === 'daughter' && styles.familyRoleButtonTextActive]}>
-                    딸
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.familyRoleButton, familyRole === 'son' && styles.familyRoleButtonActive]}
-                  onPress={() => setFamilyRole('son')}
-                >
-                  <Text style={[styles.familyRoleButtonText, familyRole === 'son' && styles.familyRoleButtonTextActive]}>
-                    아들
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          )}
-        </View>
-
-        <TouchableOpacity style={styles.createButton} onPress={handleCreateFamily}>
-          <Text style={styles.createButtonText}>가족 만들기</Text>
-        </TouchableOpacity>
+            <TouchableOpacity style={styles.continueButton} onPress={handleContinueToMain}>
+              <Text style={styles.continueButtonText}>메인으로 이동</Text>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -243,38 +252,6 @@ const styles = StyleSheet.create({
     color: colors.text,
     backgroundColor: colors.card,
   },
-  roleContainer: {
-    marginTop: 16,
-  },
-  roleLabel: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginBottom: 8,
-  },
-  roleButtons: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  roleButton: {
-    flex: 1,
-    padding: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: 'center',
-  },
-  roleButtonActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  roleButtonText: {
-    fontSize: 14,
-    color: colors.text,
-  },
-  roleButtonTextActive: {
-    color: colors.textDark,
-    fontWeight: '600',
-  },
   createButton: {
     backgroundColor: colors.primary,
     paddingVertical: 16,
@@ -287,36 +264,89 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  familyRoleContainer: {
-    marginTop: 16,
+  // 성공 화면 스타일
+  successSection: {
+    alignItems: 'center',
+    marginBottom: 40,
   },
-  familyRoleLabel: {
-    fontSize: 14,
-    color: colors.textSecondary,
+  successIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: colors.primaryLight,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  successIconText: {
+    fontSize: 40,
+  },
+  successTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: colors.text,
     marginBottom: 8,
   },
-  familyRoleButtons: {
-    flexDirection: 'row',
-    gap: 12,
+  successSubtitle: {
+    fontSize: 16,
+    color: colors.textSecondary,
+    textAlign: 'center',
   },
-  familyRoleButton: {
-    flex: 1,
-    padding: 12,
-    borderRadius: 8,
+  inviteCodeSection: {
+    marginBottom: 30,
+  },
+  inviteCodeLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text,
+    marginBottom: 12,
+  },
+  inviteCodeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.card,
     borderWidth: 1,
     borderColor: colors.border,
-    alignItems: 'center',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 8,
   },
-  familyRoleButtonActive: {
+  inviteCodeText: {
+    flex: 1,
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: colors.primary,
+    textAlign: 'center',
+    letterSpacing: 2,
+  },
+  copyButton: {
     backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    marginLeft: 12,
   },
-  familyRoleButtonText: {
-    fontSize: 14,
-    color: colors.text,
-  },
-  familyRoleButtonTextActive: {
+  copyButtonText: {
     color: colors.textDark,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  inviteCodeHint: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    fontStyle: 'italic',
+  },
+  continueButton: {
+    backgroundColor: colors.primary,
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  continueButtonText: {
+    color: colors.textDark,
+    fontSize: 16,
     fontWeight: '600',
   },
 }); 
